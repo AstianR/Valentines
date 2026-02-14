@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>White Chocolate</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            padding: 24px;
+            color: #fff2f8;
+            font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+            background:
+                radial-gradient(circle at 14% 16%, rgba(255, 243, 220, 0.6), transparent 34%),
+                radial-gradient(circle at 84% 20%, rgba(255, 224, 241, 0.45), transparent 36%),
+                linear-gradient(145deg, #4b1a2a 0%, #7a2f45 45%, #3a1422 100%);
+            overflow-x: hidden;
+        }
+
+        .bg-decor {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bg-decor::before,
+        .bg-decor::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+        }
+
+        .bg-decor::before {
+            background:
+                repeating-linear-gradient(135deg, rgba(255, 226, 193, 0.11) 0 16px, transparent 16px 36px),
+                repeating-linear-gradient(45deg, rgba(255, 173, 209, 0.08) 0 14px, transparent 14px 34px);
+            opacity: 0.7;
+        }
+
+        .bg-decor::after {
+            background-image:
+                radial-gradient(circle, rgba(255, 244, 228, 0.46) 0 1px, transparent 2px),
+                radial-gradient(circle, rgba(255, 190, 223, 0.4) 0 1px, transparent 2px);
+            background-size: 110px 110px, 150px 150px;
+            background-position: 0 0, 30px 20px;
+            opacity: 0.42;
+        }
+
+        .choco-particle-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .sticker {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 231, 207, 0.5);
+            background: linear-gradient(160deg, rgba(255, 246, 228, 0.22), rgba(255, 208, 233, 0.16));
+            box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.2);
+            transform: rotate(10deg);
+            opacity: 0.75;
+        }
+
+        .st1 { top: 5%; left: 4%; }
+        .st2 { top: 6%; right: 5%; transform: rotate(-11deg); }
+        .st3 { bottom: 6%; left: 6%; transform: rotate(-8deg); }
+        .st4 { bottom: 7%; right: 5%; transform: rotate(9deg); }
+
+        .confetti {
+            position: absolute;
+            width: 9px;
+            height: 9px;
+            border-radius: 2px;
+            background: #ffd3e6;
+            box-shadow: 0 0 10px rgba(255, 210, 231, 0.5);
+            animation: confetti-float 4.8s ease-in-out infinite;
+        }
+
+        .k1 { top: 14%; left: 28%; transform: rotate(22deg); }
+        .k2 { top: 20%; left: 41%; transform: rotate(-18deg); animation-delay: -1s; }
+        .k3 { top: 18%; right: 33%; transform: rotate(28deg); animation-delay: -1.6s; }
+        .k4 { top: 34%; right: 16%; transform: rotate(-24deg); animation-delay: -0.8s; }
+        .k5 { bottom: 28%; left: 15%; transform: rotate(20deg); animation-delay: -2.1s; }
+        .k6 { bottom: 20%; left: 30%; transform: rotate(-26deg); animation-delay: -2.8s; }
+        .k7 { bottom: 22%; right: 20%; transform: rotate(30deg); animation-delay: -1.9s; }
+        .k8 { bottom: 14%; right: 34%; transform: rotate(-20deg); animation-delay: -3.1s; }
+
+        .candy-orb {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.95), rgba(255, 189, 219, 0.86));
+            box-shadow: 0 0 14px rgba(255, 182, 214, 0.45);
+            opacity: 0.75;
+        }
+
+        .o1 { top: 26%; left: 8%; }
+        .o2 { top: 24%; right: 10%; }
+        .o3 { bottom: 30%; left: 9%; }
+        .o4 { bottom: 26%; right: 11%; }
+
+        .ring {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 22px;
+            border: 1px solid rgba(255, 230, 203, 0.46);
+            box-shadow: inset 0 0 24px rgba(255, 207, 155, 0.18);
+            background: linear-gradient(160deg, rgba(255, 237, 209, 0.12), rgba(255, 190, 220, 0.09));
+            transform: rotate(12deg);
+        }
+
+        .r1 { top: 8%; left: 8%; }
+        .r2 { top: 12%; right: 8%; }
+        .r3 { bottom: 10%; left: 10%; }
+        .r4 { bottom: 12%; right: 9%; }
+
+        .vine {
+            position: absolute;
+            border-radius: 999px;
+            background: linear-gradient(180deg, rgba(255, 228, 196, 0.5), rgba(255, 169, 206, 0.42));
+            box-shadow: 0 0 14px rgba(255, 205, 221, 0.24);
+        }
+
+        .v1 {
+            width: 18px;
+            height: 280px;
+            left: 7%;
+            top: 4%;
+            transform: rotate(24deg);
+        }
+
+        .v2 {
+            width: 18px;
+            height: 300px;
+            right: 7%;
+            top: 3%;
+            transform: rotate(-24deg);
+        }
+
+        .v3 {
+            width: 16px;
+            height: 240px;
+            left: 10%;
+            bottom: 6%;
+            transform: rotate(-18deg);
+        }
+
+        .v4 {
+            width: 16px;
+            height: 240px;
+            right: 10%;
+            bottom: 7%;
+            transform: rotate(18deg);
+        }
+
+        .leaf {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.75), rgba(255, 203, 160, 0.95));
+            box-shadow: 0 0 10px rgba(255, 214, 174, 0.45);
+            opacity: 0.88;
+        }
+
+        .lf1 { left: 88px; top: 124px; }
+        .lf2 { left: 132px; top: 196px; }
+        .lf3 { right: 86px; top: 130px; }
+        .lf4 { right: 130px; top: 200px; }
+        .lf5 { left: 106px; bottom: 152px; }
+        .lf6 { right: 106px; bottom: 152px; }
+
+        .heart {
+            position: absolute;
+            color: rgba(255, 226, 192, 0.78);
+            text-shadow: 0 0 14px rgba(255, 206, 158, 0.62);
+            font-size: clamp(24px, 3vw, 38px);
+            animation: heart-pulse 2.8s ease-in-out infinite;
+        }
+
+        .h1 { top: 10%; left: 44%; }
+        .h2 { top: 25%; left: 16%; animation-delay: -0.6s; }
+        .h3 { top: 28%; right: 14%; animation-delay: -1.2s; }
+        .h4 { bottom: 16%; left: 24%; animation-delay: -0.9s; }
+        .h5 { bottom: 22%; right: 28%; animation-delay: -1.7s; }
+
+        .petal {
+            position: absolute;
+            width: 16px;
+            height: 8px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #ffd7be 0%, #ffb8d9 100%);
+            box-shadow: 0 0 8px rgba(255, 190, 216, 0.4);
+            opacity: 0.8;
+        }
+
+        .p1 { left: 26%; top: 16%; transform: rotate(24deg); }
+        .p2 { right: 24%; top: 18%; transform: rotate(-24deg); }
+        .p3 { left: 18%; bottom: 22%; transform: rotate(28deg); }
+        .p4 { right: 17%; bottom: 24%; transform: rotate(-28deg); }
+
+        .spark {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #ffe0ef;
+            box-shadow: 0 0 12px rgba(255, 210, 230, 0.8);
+        }
+
+        .s1 { top: 12%; left: 36%; }
+        .s2 { top: 20%; right: 36%; }
+        .s3 { bottom: 18%; left: 34%; }
+        .s4 { bottom: 22%; right: 34%; }
+
+        .wrap {
+            position: relative;
+            z-index: 1;
+            width: min(1080px, 100%);
+            margin: 0 auto;
+        }
+
+        .pointer-glow {
+            position: fixed;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(255, 220, 188, 0.25) 0%, rgba(255, 189, 219, 0.13) 45%, transparent 70%);
+            filter: blur(2px);
+            transition: opacity 180ms ease;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .back-btn {
+            padding: 9px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 229, 201, 0.75);
+            color: #fff4e6;
+            text-decoration: none;
+            font-size: 0.82rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            background: rgba(185, 112, 138, 0.45);
+            transition: transform 160ms ease, box-shadow 160ms ease;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+        }
+
+        h1 {
+            font-family: "Georgia", serif;
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            color: #ffe6d2;
+            text-shadow: 0 0 14px rgba(255, 211, 165, 0.45);
+        }
+
+        .subtitle {
+            color: #ffd9ea;
+            opacity: 0.94;
+            margin-bottom: 18px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .card {
+            border-radius: 18px;
+            border: 1px solid rgba(255, 231, 207, 0.36);
+            background: linear-gradient(145deg, rgba(96, 39, 54, 0.9), rgba(47, 17, 27, 0.92));
+            box-shadow: 0 16px 30px rgba(0, 0, 0, 0.35);
+            padding: 16px;
+            overflow: hidden;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 170ms ease, box-shadow 170ms ease, border-color 170ms ease;
+            will-change: transform;
+        }
+
+        .card:hover {
+            border-color: rgba(255, 237, 219, 0.58);
+            box-shadow: 0 20px 36px rgba(0, 0, 0, 0.42), 0 0 24px rgba(255, 206, 170, 0.22);
+        }
+
+        .card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(160deg, rgba(255, 221, 187, 0.16), transparent 55%);
+            pointer-events: none;
+        }
+
+        .card .ripple {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 241, 224, 0.5);
+            transform: translate(-50%, -50%) scale(0);
+            animation: card-ripple 620ms ease-out forwards;
+            pointer-events: none;
+            z-index: 4;
+        }
+
+        .choco {
+            --tone-a: #fff6e8;
+            --tone-b: #efd9b7;
+            --top-a: #fffef8;
+            --top-b: #f6e9d1;
+            --side-a: #e5c79e;
+            --side-b: #c9a57e;
+            --line: rgba(180, 142, 103, 0.26);
+            width: 158px;
+            height: 108px;
+            margin: 8px auto 16px;
+            border-radius: 12px;
+            position: relative;
+            border: 1px solid rgba(255, 242, 219, 0.62);
+            background: linear-gradient(160deg, var(--tone-a) 0%, var(--tone-b) 100%);
+            box-shadow:
+                inset 0 12px 16px rgba(255, 255, 255, 0.58),
+                inset -12px 0 18px rgba(255, 255, 255, 0.32),
+                inset 14px 0 18px rgba(160, 126, 92, 0.36),
+                inset 0 -12px 16px rgba(145, 105, 70, 0.24),
+                0 12px 16px rgba(0, 0, 0, 0.28);
+            transform: none;
+            transform-origin: center;
+            overflow: visible;
+        }
+
+        .choco::before {
+            content: "";
+            position: absolute;
+            top: 6px;
+            left: -12px;
+            width: 12px;
+            bottom: 6px;
+            border-radius: 6px 2px 2px 6px;
+            background: linear-gradient(180deg, var(--side-a) 0%, var(--side-b) 100%);
+            transform: skewY(-14deg);
+            opacity: 0.95;
+            box-shadow: inset -2px 0 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .choco::after {
+            content: "";
+            position: absolute;
+            left: 8px;
+            right: 8px;
+            bottom: -12px;
+            height: 12px;
+            border-radius: 2px 2px 8px 8px;
+            background: linear-gradient(180deg, var(--top-b) 0%, var(--side-b) 100%);
+            transform: skewX(-28deg);
+            opacity: 0.95;
+            box-shadow:
+                0 -3px 0 rgba(162, 128, 94, 0.25),
+                0 8px 10px -8px rgba(0, 0, 0, 0.35);
+        }
+
+        .choco .gridline {
+            position: absolute;
+            inset: 11px;
+            border-radius: 8px;
+            background:
+                repeating-linear-gradient(90deg, var(--line) 0 2px, transparent 2px 24px),
+                repeating-linear-gradient(180deg, var(--line) 0 2px, transparent 2px 22px);
+            box-shadow: inset 0 0 0 1px rgba(160, 125, 90, 0.22);
+        }
+
+        .choco .shine {
+            position: absolute;
+            left: 14px;
+            top: 10px;
+            width: 36px;
+            height: 82px;
+            border-radius: 12px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0));
+            filter: blur(0.2px);
+        }
+
+        .choco .badge {
+            position: absolute;
+            left: 50%;
+            bottom: 8px;
+            transform: translateX(-50%);
+            font-size: 0.56rem;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+            color: rgba(114, 79, 53, 0.86);
+            padding: 2px 6px;
+            border-radius: 8px;
+            background: rgba(255, 250, 236, 0.58);
+            border: 1px solid rgba(192, 157, 120, 0.46);
+        }
+
+        .choco .emboss {
+            position: absolute;
+            top: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.54rem;
+            letter-spacing: 0.1em;
+            color: rgba(143, 108, 78, 0.56);
+            text-transform: uppercase;
+        }
+
+        .choco .crumb {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(146, 118, 92, 0.55);
+            box-shadow: 0 0 5px rgba(120, 90, 65, 0.2);
+        }
+
+        .choco .c1 {
+            top: 42px;
+            right: 18px;
+        }
+
+        .choco .c2 {
+            top: 64px;
+            right: 30px;
+            width: 4px;
+            height: 4px;
+        }
+
+        .choco .c3 {
+            top: 56px;
+            right: 10px;
+            width: 5px;
+            height: 5px;
+        }
+
+        .choco .corner-bite {
+            display: none;
+        }
+
+        .choco .wrap-tag {
+            position: absolute;
+            top: -9px;
+            left: 12px;
+            font-size: 0.5rem;
+            letter-spacing: 0.08em;
+            color: rgba(113, 79, 55, 0.82);
+            background: rgba(255, 247, 232, 0.85);
+            border: 1px solid rgba(188, 149, 111, 0.42);
+            border-radius: 6px;
+            padding: 1px 5px;
+        }
+
+        .choco.hersheys {
+            --tone-a: #fff4e5;
+            --tone-b: #e8cfad;
+            --top-a: #fffdf6;
+            --top-b: #f0ddbf;
+            --side-a: #dec199;
+            --side-b: #c4a37d;
+            --line: rgba(188, 147, 101, 0.32);
+            transform: none;
+        }
+
+        .choco.cadbury {
+            --tone-a: #f8f0ff;
+            --tone-b: #decdf1;
+            --top-a: #fcf7ff;
+            --top-b: #e5d7f3;
+            --side-a: #cdb9df;
+            --side-b: #b499cb;
+            --line: rgba(159, 129, 190, 0.26);
+            transform: none;
+        }
+
+        .choco.cookies {
+            --tone-a: #f7f7fb;
+            --tone-b: #dfe2ec;
+            --top-a: #feffff;
+            --top-b: #eceef5;
+            --side-a: #ccd2df;
+            --side-b: #afb6c8;
+            --line: rgba(124, 128, 138, 0.28);
+            transform: none;
+        }
+
+        .choco.cookies .crumb {
+            background: rgba(77, 80, 92, 0.62);
+        }
+
+        .name {
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            color: #fff0df;
+        }
+
+        .desc {
+            margin-top: 6px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #ffd5ea;
+        }
+
+
+        .choco-letter {
+            width: min(760px, 100%);
+            margin: 0 auto 14px;
+            background:
+                linear-gradient(rgba(255, 244, 224, 0.96), rgba(250, 229, 199, 0.94)),
+                repeating-linear-gradient(180deg, rgba(174, 132, 95, 0.16) 0px, rgba(174, 132, 95, 0.16) 1px, transparent 1px, transparent 30px);
+            border: 1px solid rgba(152, 111, 77, 0.42);
+            border-radius: 14px;
+            box-shadow: 0 18px 30px rgba(0, 0, 0, 0.3);
+            padding: clamp(16px, 2.8vw, 22px);
+            transform: rotate(-0.5deg);
+        }
+
+        .choco-letter h3 {
+            font-family: "Georgia", serif;
+            color: #7b4336;
+            font-size: clamp(1.15rem, 2.2vw, 1.5rem);
+            margin-bottom: 8px;
+        }
+
+        .choco-letter p {
+            color: #6b3c30;
+            font-family: "Georgia", serif;
+            font-size: clamp(1rem, 1.9vw, 1.16rem);
+            line-height: 1.7;
+        }
+
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 620px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @keyframes card-ripple {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0.9;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(18);
+                opacity: 0;
+            }
+        }
+
+        @keyframes confetti-float {
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-6px) rotate(18deg);
+            }
+        }
+
+        @keyframes heart-pulse {
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.65;
+            }
+            50% {
+                transform: scale(1.28);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="pointer-glow" id="pointerGlow"></div>
+    <div class="bg-decor">
+        <span class="sticker st1"></span>
+        <span class="sticker st2"></span>
+        <span class="sticker st3"></span>
+        <span class="sticker st4"></span>
+        <div class="vine v1"></div>
+        <div class="vine v2"></div>
+        <div class="vine v3"></div>
+        <div class="vine v4"></div>
+        <span class="leaf lf1"></span>
+        <span class="leaf lf2"></span>
+        <span class="leaf lf3"></span>
+        <span class="leaf lf4"></span>
+        <span class="leaf lf5"></span>
+        <span class="leaf lf6"></span>
+        <span class="ring r1"></span>
+        <span class="ring r2"></span>
+        <span class="ring r3"></span>
+        <span class="ring r4"></span>
+        <span class="heart h1">&#10084;</span>
+        <span class="heart h2">&#10084;</span>
+        <span class="heart h3">&#10084;</span>
+        <span class="heart h4">&#10084;</span>
+        <span class="heart h5">&#10084;</span>
+        <span class="petal p1"></span>
+        <span class="petal p2"></span>
+        <span class="petal p3"></span>
+        <span class="petal p4"></span>
+        <span class="spark s1"></span>
+        <span class="spark s2"></span>
+        <span class="spark s3"></span>
+        <span class="spark s4"></span>
+        <span class="confetti k1"></span>
+        <span class="confetti k2"></span>
+        <span class="confetti k3"></span>
+        <span class="confetti k4"></span>
+        <span class="confetti k5"></span>
+        <span class="confetti k6"></span>
+        <span class="confetti k7"></span>
+        <span class="confetti k8"></span>
+        <span class="candy-orb o1"></span>
+        <span class="candy-orb o2"></span>
+        <span class="candy-orb o3"></span>
+        <span class="candy-orb o4"></span>
+    </div>
+    <canvas id="chocoParticleCanvas" class="choco-particle-canvas"></canvas>
+
+    <main class="wrap">
+        <div class="topbar">
+            <a class="back-btn" href="heart-particle.html">Back</a>
+            <h1>White Chocolate Gallery</h1>
+        </div>
+        <p class="subtitle">Valentine white chocolate collection with creamy bar designs.</p>
+
+        <section class="grid">
+            <article class="card">
+                <div class="choco hersheys"><span class="wrap-tag">BAR</span><span class="gridline"></span><span class="shine"></span><span class="emboss">MILK WHITE</span><span class="crumb c1"></span><span class="crumb c2"></span><span class="crumb c3"></span><span class="corner-bite"></span><span class="badge">HERSHEY'S</span></div>
+                <h2 class="name">Hershey's White</h2>
+                <p class="desc">Classic creamy white chocolate bar.</p>
+            </article>
+            <article class="card">
+                <div class="choco cadbury"><span class="wrap-tag">PREMIUM</span><span class="gridline"></span><span class="shine"></span><span class="emboss">DAIRY STYLE</span><span class="crumb c1"></span><span class="crumb c2"></span><span class="crumb c3"></span><span class="corner-bite"></span><span class="badge">CADBURY</span></div>
+                <h2 class="name">Cadbury Dairy Milk White</h2>
+                <p class="desc">Sweet milky Cadbury white style.</p>
+            </article>
+            <article class="card">
+                <div class="choco cookies"><span class="wrap-tag">CRUNCH</span><span class="gridline"></span><span class="shine"></span><span class="emboss">COOKIE BITS</span><span class="crumb c1"></span><span class="crumb c2"></span><span class="crumb c3"></span><span class="corner-bite"></span><span class="badge">COOKIES</span></div>
+                <h2 class="name">Cookies & Cream</h2>
+                <p class="desc">White chocolate with cookie bits vibe.</p>
+            </article>
+            <article class="card">
+                <div class="choco hersheys"><span class="wrap-tag">CLASSIC</span><span class="gridline"></span><span class="shine"></span><span class="emboss">N' CREME</span><span class="crumb c1"></span><span class="crumb c2"></span><span class="crumb c3"></span><span class="corner-bite"></span><span class="badge">HERSHEY'S</span></div>
+                <h2 class="name">Hershey's Cookies 'n' Creme</h2>
+                <p class="desc">Creamy white bar with crunchy cookie texture.</p>
+            </article>
+            <article class="card">
+                <div class="choco cadbury"><span class="wrap-tag">BUTTONS</span><span class="gridline"></span><span class="shine"></span><span class="emboss">SWEET CREAM</span><span class="crumb c1"></span><span class="crumb c2"></span><span class="crumb c3"></span><span class="corner-bite"></span><span class="badge">CADBURY</span></div>
+                <h2 class="name">Cadbury White Buttons</h2>
+                <p class="desc">Small creamy Cadbury white chocolate bites.</p>
+            </article>
+            <article class="card">
+                <div class="choco cookies"><span class="wrap-tag">OREO MIX</span><span class="gridline"></span><span class="shine"></span><span class="emboss">COOKIES N CREAM</span><span class="crumb c1"></span><span class="crumb c2"></span><span class="crumb c3"></span><span class="corner-bite"></span><span class="badge">OREO</span></div>
+                <h2 class="name">Cadbury Oreo White</h2>
+                <p class="desc">Cookies and cream inspired white chocolate.</p>
+            </article>
+        </section>
+
+        <section class="choco-letter">
+            <h3>Just A Little Note</h3>
+            <p>"I have your favorite chocolates"</p>
+        </section>
+    </main>
+    <script>
+        (function chocolateParticles() {
+            const canvas = document.getElementById("chocoParticleCanvas");
+            if (!canvas) return;
+            const ctx = canvas.getContext("2d");
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            let w = 0;
+            let h = 0;
+            let parts = [];
+            let lastSpawn = 0;
+
+            function resize() {
+                w = window.innerWidth;
+                h = window.innerHeight;
+                canvas.width = Math.floor(w * dpr);
+                canvas.height = Math.floor(h * dpr);
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            }
+
+            function rnd(min, max) {
+                return min + Math.random() * (max - min);
+            }
+
+            function makePiece(x, y, burst = false) {
+                const kinds = ["white", "cookie", "choco"];
+                const kind = kinds[Math.floor(Math.random() * kinds.length)];
+                return {
+                    x,
+                    y,
+                    vx: rnd(-0.35, 0.35) * (burst ? 2.4 : 1),
+                    vy: rnd(-0.25, -0.06) * (burst ? 2.2 : 1),
+                    size: rnd(6, 14),
+                    life: 0,
+                    maxLife: rnd(90, 150),
+                    rot: rnd(0, Math.PI * 2),
+                    spin: rnd(-0.03, 0.03),
+                    kind
+                };
+            }
+
+            function drawPiece(p) {
+                const t = p.life / p.maxLife;
+                const alpha = t < 0.65 ? 0.9 : Math.max(0, 1 - (t - 0.65) / 0.35);
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.rot);
+                if (p.kind === "white") {
+                    ctx.fillStyle = `rgba(255,244,224,${alpha})`;
+                    ctx.strokeStyle = `rgba(214,180,150,${alpha * 0.7})`;
+                } else if (p.kind === "cookie") {
+                    ctx.fillStyle = `rgba(236,238,247,${alpha})`;
+                    ctx.strokeStyle = `rgba(170,172,185,${alpha * 0.7})`;
+                } else {
+                    ctx.fillStyle = `rgba(224,198,166,${alpha})`;
+                    ctx.strokeStyle = `rgba(165,126,90,${alpha * 0.7})`;
+                }
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.roundRect(-p.size / 2, -p.size / 2, p.size, p.size, 2);
+                ctx.fill();
+                ctx.stroke();
+                if (p.kind === "cookie") {
+                    ctx.fillStyle = `rgba(95,92,98,${alpha * 0.7})`;
+                    ctx.beginPath();
+                    ctx.arc(-1, -1, 1.3, 0, Math.PI * 2);
+                    ctx.arc(2, 1.8, 1, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
+
+            function spawnAuto() {
+                parts.push(makePiece(rnd(0, w), rnd(h * 0.1, h * 0.95), false));
+                if (parts.length > 180) parts = parts.slice(-180);
+            }
+
+            function spawnBurst(x, y) {
+                for (let i = 0; i < 14; i++) parts.push(makePiece(x + rnd(-20, 20), y + rnd(-14, 14), true));
+            }
+
+            function tick(ts) {
+                ctx.clearRect(0, 0, w, h);
+                if (ts - lastSpawn > 170) {
+                    spawnAuto();
+                    lastSpawn = ts;
+                }
+
+                parts.forEach((p) => {
+                    p.life += 1;
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.rot += p.spin;
+                    drawPiece(p);
+                });
+                parts = parts.filter((p) => p.life < p.maxLife && p.y > -25);
+                requestAnimationFrame(tick);
+            }
+
+            window.addEventListener("resize", resize);
+            window.addEventListener("click", (e) => spawnBurst(e.clientX, e.clientY));
+            resize();
+            requestAnimationFrame(tick);
+        })();
+
+        (function interactiveDesign() {
+            const glow = document.getElementById("pointerGlow");
+            const cards = Array.from(document.querySelectorAll(".card"));
+
+            window.addEventListener("pointermove", (e) => {
+                if (!glow) return;
+                glow.style.opacity = "1";
+                glow.style.left = `${e.clientX}px`;
+                glow.style.top = `${e.clientY}px`;
+            });
+
+            window.addEventListener("pointerleave", () => {
+                if (!glow) return;
+                glow.style.opacity = "0";
+            });
+
+            cards.forEach((card) => {
+                card.addEventListener("mousemove", (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const px = (e.clientX - rect.left) / rect.width;
+                    const py = (e.clientY - rect.top) / rect.height;
+                    const rx = (0.5 - py) * 9;
+                    const ry = (px - 0.5) * 11;
+                    card.style.transform = `perspective(860px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+                });
+
+                card.addEventListener("mouseleave", () => {
+                    card.style.transform = "perspective(860px) rotateX(0deg) rotateY(0deg)";
+                });
+
+                card.addEventListener("click", (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const ripple = document.createElement("span");
+                    ripple.className = "ripple";
+                    ripple.style.left = `${e.clientX - rect.left}px`;
+                    ripple.style.top = `${e.clientY - rect.top}px`;
+                    card.appendChild(ripple);
+                    setTimeout(() => ripple.remove(), 650);
+                });
+            });
+        })();
+    </script>
+</body>
+
+</html>

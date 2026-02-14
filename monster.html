@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monster Energy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            padding: 24px;
+            color: #ffe7ef;
+            font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+            background:
+                radial-gradient(circle at 20% 12%, rgba(255, 116, 166, 0.2), transparent 30%),
+                radial-gradient(circle at 80% 18%, rgba(255, 175, 210, 0.15), transparent 26%),
+                radial-gradient(circle at 40% 90%, rgba(255, 98, 152, 0.12), transparent 32%),
+                linear-gradient(150deg, #2a0710 0%, #4d0f24 35%, #20060d 100%);
+            overflow-x: hidden;
+        }
+
+        .bg-vines {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bg-vines::before,
+        .bg-vines::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+        }
+
+        .bg-vines::before {
+            background:
+                radial-gradient(circle at 8% 44%, rgba(255, 170, 214, 0.14) 0 34px, transparent 35px),
+                radial-gradient(circle at 92% 38%, rgba(255, 186, 223, 0.14) 0 34px, transparent 35px),
+                radial-gradient(circle at 16% 78%, rgba(255, 192, 162, 0.12) 0 28px, transparent 29px),
+                radial-gradient(circle at 84% 74%, rgba(255, 180, 214, 0.12) 0 28px, transparent 29px);
+            opacity: 0.85;
+        }
+
+        .bg-vines::after {
+            background-image:
+                radial-gradient(circle, rgba(255, 230, 240, 0.36) 0 1px, transparent 2px),
+                radial-gradient(circle, rgba(255, 185, 221, 0.3) 0 1px, transparent 2px);
+            background-size: 130px 130px, 170px 170px;
+            background-position: 0 0, 38px 24px;
+            opacity: 0.4;
+        }
+
+        .blossom-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .vine {
+            position: absolute;
+            border: 3px solid rgba(122, 205, 120, 0.25);
+            border-radius: 50%;
+            filter: drop-shadow(0 0 7px rgba(122, 205, 120, 0.25));
+        }
+
+        .v1 {
+            width: 360px;
+            height: 640px;
+            left: -140px;
+            top: -120px;
+            border-right-color: transparent;
+            border-top-color: transparent;
+            transform: rotate(13deg);
+        }
+
+        .v2 {
+            width: 340px;
+            height: 560px;
+            right: -130px;
+            top: -110px;
+            border-left-color: transparent;
+            border-top-color: transparent;
+            transform: rotate(-12deg);
+        }
+
+        .v3 {
+            width: 280px;
+            height: 470px;
+            left: -90px;
+            bottom: -150px;
+            border-right-color: transparent;
+            border-bottom-color: transparent;
+            transform: rotate(-14deg);
+        }
+
+        .v4 {
+            width: 300px;
+            height: 490px;
+            right: -110px;
+            bottom: -140px;
+            border-left-color: transparent;
+            border-bottom-color: transparent;
+            transform: rotate(14deg);
+        }
+
+        .v5 {
+            width: 230px;
+            height: 430px;
+            left: 22%;
+            top: -170px;
+            border-right-color: transparent;
+            border-top-color: transparent;
+            transform: rotate(26deg);
+            opacity: 0.66;
+        }
+
+        .v6 {
+            width: 230px;
+            height: 430px;
+            right: 22%;
+            top: -170px;
+            border-left-color: transparent;
+            border-top-color: transparent;
+            transform: rotate(-26deg);
+            opacity: 0.66;
+        }
+
+        .v7 {
+            width: 210px;
+            height: 380px;
+            left: 18%;
+            bottom: -130px;
+            border-right-color: transparent;
+            border-bottom-color: transparent;
+            transform: rotate(-22deg);
+            opacity: 0.52;
+        }
+
+        .v8 {
+            width: 210px;
+            height: 380px;
+            right: 18%;
+            bottom: -130px;
+            border-left-color: transparent;
+            border-bottom-color: transparent;
+            transform: rotate(22deg);
+            opacity: 0.52;
+        }
+
+        .v9 {
+            width: 180px;
+            height: 320px;
+            left: 8%;
+            top: 26%;
+            border-right-color: transparent;
+            border-top-color: transparent;
+            transform: rotate(18deg);
+            opacity: 0.48;
+        }
+
+        .v10 {
+            width: 180px;
+            height: 320px;
+            right: 8%;
+            top: 28%;
+            border-left-color: transparent;
+            border-top-color: transparent;
+            transform: rotate(-18deg);
+            opacity: 0.48;
+        }
+
+        .leaf {
+            --stem-rot: 24deg;
+            --stem-len: 16px;
+            position: absolute;
+            width: 14px;
+            height: 26px;
+            border-radius: 70% 10% 70% 10%;
+            background: linear-gradient(160deg, rgba(158, 244, 145, 0.95), rgba(76, 162, 80, 0.92));
+            box-shadow: 0 0 8px rgba(119, 214, 123, 0.38);
+            opacity: 0.85;
+            transform-origin: 18% 82%;
+        }
+
+        .leaf::before {
+            content: "";
+            position: absolute;
+            width: 2px;
+            height: var(--stem-len);
+            left: -4px;
+            top: 10px;
+            border-radius: 2px;
+            background: rgba(122, 205, 120, 0.7);
+            transform: rotate(var(--stem-rot));
+        }
+
+        .lf1 { left: 92px; top: 146px; transform: rotate(24deg); --stem-rot: 28deg; }
+        .lf2 { left: 150px; top: 236px; transform: rotate(-20deg); --stem-rot: -18deg; }
+        .lf3 { left: 116px; bottom: 182px; transform: rotate(26deg); --stem-rot: 28deg; }
+        .lf4 { right: 100px; top: 170px; transform: rotate(-24deg); --stem-rot: -24deg; }
+        .lf5 { right: 166px; top: 254px; transform: rotate(22deg); --stem-rot: 20deg; }
+        .lf6 { right: 132px; bottom: 192px; transform: rotate(-26deg); --stem-rot: -28deg; }
+        .lf7 { left: 29%; top: 96px; transform: rotate(24deg); --stem-rot: 26deg; }
+        .lf8 { right: 30%; top: 102px; transform: rotate(-24deg); --stem-rot: -26deg; }
+        .lf9 { left: 10%; top: 44%; transform: rotate(20deg); --stem-rot: 24deg; }
+        .lf10 { left: 13%; top: 52%; transform: rotate(-18deg); --stem-rot: -18deg; }
+        .lf11 { right: 10%; top: 46%; transform: rotate(-20deg); --stem-rot: -24deg; }
+        .lf12 { right: 13%; top: 54%; transform: rotate(18deg); --stem-rot: 18deg; }
+
+        .spark {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #ffb3d1;
+            box-shadow: 0 0 12px rgba(255, 179, 209, 0.78);
+        }
+
+        .s1 {
+            top: 15%;
+            left: 24%;
+        }
+
+        .s2 {
+            top: 28%;
+            right: 21%;
+        }
+
+        .s3 {
+            bottom: 19%;
+            left: 18%;
+        }
+
+        .s4 {
+            bottom: 24%;
+            right: 26%;
+        }
+
+        .heart {
+            position: absolute;
+            color: rgba(255, 170, 206, 0.65);
+            font-size: 18px;
+            text-shadow: 0 0 14px rgba(255, 138, 188, 0.55);
+        }
+
+        .h1 { top: 12%; left: 46%; }
+        .h2 { top: 26%; left: 12%; }
+        .h3 { top: 30%; right: 14%; }
+        .h4 { bottom: 18%; left: 26%; }
+        .h5 { bottom: 22%; right: 28%; }
+
+        .petal {
+            position: absolute;
+            width: 14px;
+            height: 22px;
+            border-radius: 70% 70% 60% 60%;
+            background: linear-gradient(180deg, #ffd0e3 0%, #ff94bc 100%);
+            box-shadow: 0 0 10px rgba(255, 150, 194, 0.45);
+            opacity: 0.75;
+            transform: rotate(18deg);
+        }
+
+        .p1 { top: 14%; left: 36%; }
+        .p2 { top: 18%; right: 34%; transform: rotate(-24deg); }
+        .p3 { top: 48%; left: 10%; transform: rotate(32deg); }
+        .p4 { top: 54%; right: 12%; transform: rotate(-18deg); }
+        .p5 { bottom: 16%; left: 34%; transform: rotate(10deg); }
+        .p6 { bottom: 14%; right: 38%; transform: rotate(-28deg); }
+
+        .halo {
+            position: absolute;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 174, 212, 0.3);
+            box-shadow: inset 0 0 30px rgba(255, 139, 188, 0.14);
+        }
+
+        .halo.a1 { top: 8%; left: 6%; }
+        .halo.a2 { top: 10%; right: 7%; }
+        .halo.a3 { bottom: 8%; left: 9%; }
+        .halo.a4 { bottom: 10%; right: 8%; }
+
+        .wrap {
+            position: relative;
+            z-index: 1;
+            width: min(1080px, 100%);
+            margin: 0 auto;
+        }
+
+        .pointer-glow {
+            position: fixed;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(255, 155, 200, 0.26) 0%, rgba(255, 155, 200, 0.12) 45%, transparent 70%);
+            filter: blur(2px);
+            transition: opacity 180ms ease;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            padding: 9px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 205, 226, 0.68);
+            color: #ffe8f2;
+            text-decoration: none;
+            font-size: 0.82rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            background: rgba(138, 28, 70, 0.45);
+            transition: transform 160ms ease, box-shadow 160ms ease;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+        }
+
+        h1 {
+            font-family: "Georgia", serif;
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            color: #ffd6e7;
+            text-shadow: 0 0 14px rgba(255, 130, 180, 0.45);
+        }
+
+        .subtitle {
+            color: #ffd4e3;
+            opacity: 0.9;
+            margin-bottom: 18px;
+        }
+
+        .variant-note {
+            margin: 0 auto 18px;
+            width: min(840px, 100%);
+            border-radius: 14px;
+            border: 1px solid rgba(145, 108, 76, 0.45);
+            background:
+                linear-gradient(rgba(249, 237, 214, 0.95), rgba(241, 224, 194, 0.94)),
+                repeating-linear-gradient(180deg, rgba(170, 132, 96, 0.14) 0px, rgba(170, 132, 96, 0.14) 1px, transparent 1px, transparent 30px);
+            box-shadow: 0 14px 26px rgba(0, 0, 0, 0.3);
+            padding: 14px 16px;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 180ms ease, transform 180ms ease;
+        }
+
+        .variant-note.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .variant-note h3 {
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #7a4d3b;
+            margin-bottom: 6px;
+            font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+        }
+
+        .variant-note p {
+            color: #5f342e;
+            font-size: 1.03rem;
+            line-height: 1.7;
+            font-family: "Georgia", serif;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .card {
+            position: relative;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 186, 214, 0.36);
+            background: linear-gradient(145deg, rgba(73, 18, 35, 0.9), rgba(40, 11, 20, 0.92));
+            box-shadow: 0 16px 30px rgba(0, 0, 0, 0.35);
+            padding: 18px;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            transition: transform 170ms ease, box-shadow 170ms ease, border-color 170ms ease;
+            will-change: transform;
+        }
+
+        .card:hover {
+            border-color: rgba(255, 214, 232, 0.58);
+            box-shadow: 0 20px 36px rgba(0, 0, 0, 0.4), 0 0 24px rgba(255, 120, 176, 0.2);
+        }
+
+        .card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(160deg, rgba(255, 160, 197, 0.16), transparent 55%);
+            pointer-events: none;
+        }
+
+        .card .ripple {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 216, 236, 0.45);
+            transform: translate(-50%, -50%) scale(0);
+            animation: card-ripple 620ms ease-out forwards;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .can {
+            --band: rgba(180, 255, 130, 0.45);
+            --accent: rgba(180, 255, 130, 0.7);
+            width: 120px;
+            height: 250px;
+            margin: 0 auto 14px;
+            border-radius: 18px;
+            position: relative;
+            box-shadow: inset -9px 0 16px rgba(255, 255, 255, 0.06), inset 8px 0 14px rgba(0, 0, 0, 0.4), 0 16px 24px rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            overflow: hidden;
+        }
+
+        .can::before {
+            content: "";
+            position: absolute;
+            left: 10px;
+            right: 10px;
+            top: 8px;
+            height: 18px;
+            border-radius: 12px;
+            background: linear-gradient(180deg, rgba(245, 245, 245, 0.35), rgba(170, 170, 170, 0.2));
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            z-index: 2;
+        }
+
+        .can::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0 16%, transparent 16% 88%, rgba(0, 0, 0, 0.22) 88% 100%),
+                repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.03) 0 2px, transparent 2px 7px);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .can .tab {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 10px;
+            border-radius: 10px;
+            background: rgba(215, 215, 215, 0.75);
+            z-index: 3;
+        }
+
+        .can .shine {
+            position: absolute;
+            top: 26px;
+            bottom: 12px;
+            left: 15px;
+            width: 18px;
+            border-radius: 20px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0.02));
+            z-index: 2;
+        }
+
+        .can .band {
+            position: absolute;
+            left: 8px;
+            right: 8px;
+            bottom: 34px;
+            height: 20px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.12), var(--band), rgba(255, 255, 255, 0.08));
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            z-index: 2;
+        }
+
+        .can .stamp {
+            position: absolute;
+            bottom: 9px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.56rem;
+            letter-spacing: 0.09em;
+            color: rgba(255, 255, 255, 0.62);
+            z-index: 2;
+        }
+
+        .logo-img {
+            position: absolute;
+            width: 74px;
+            top: 68px;
+            left: 50%;
+            transform: translateX(-50%);
+            filter: brightness(1.08) contrast(1.15) saturate(1.12) drop-shadow(0 0 10px rgba(164, 255, 120, 0.5));
+        }
+
+        .claw {
+            position: absolute;
+            top: 70px;
+            left: 50%;
+            width: 72px;
+            height: 124px;
+            transform: translateX(-50%);
+            filter: drop-shadow(0 0 10px currentColor);
+            display: none;
+        }
+
+        .can.no-logo .claw {
+            display: block;
+        }
+
+        .claw span {
+            position: absolute;
+            width: 18px;
+            height: 108px;
+            border-radius: 10px;
+            background: currentColor;
+            clip-path: polygon(50% 0%, 100% 24%, 86% 46%, 100% 67%, 84% 84%, 54% 100%, 26% 86%, 0% 66%, 14% 46%, 0% 22%);
+        }
+
+        .claw span:nth-child(1) {
+            left: 2px;
+            transform: rotate(-12deg);
+        }
+
+        .claw span:nth-child(2) {
+            left: 27px;
+            transform: rotate(2deg);
+        }
+
+        .claw span:nth-child(3) {
+            left: 52px;
+            transform: rotate(13deg);
+        }
+
+        .can.original {
+            background: linear-gradient(180deg, #151515 0%, #0b0b0b 100%);
+            color: #82ff49;
+            --band: rgba(134, 255, 90, 0.5);
+        }
+
+        .can.ultra {
+            background:
+                radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.08) 40%),
+                linear-gradient(180deg, #fafafa 0%, #dbdbdb 100%);
+            color: #7cff66;
+            --band: rgba(112, 255, 94, 0.36);
+        }
+
+        .can.ultra .frost {
+            position: absolute;
+            inset: 40px 14px 78px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0.06));
+            box-shadow: inset 0 0 14px rgba(255, 255, 255, 0.35);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .can.ultra .frost::before,
+        .can.ultra .frost::after {
+            content: "";
+            position: absolute;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.88);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.65);
+        }
+
+        .can.ultra .frost::before {
+            top: 18px;
+            left: 16px;
+        }
+
+        .can.ultra .frost::after {
+            top: 44px;
+            right: 18px;
+        }
+
+        .can.ultra .ultra-mark {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            color: rgba(92, 173, 90, 0.9);
+            z-index: 3;
+        }
+
+        .can.pipeline {
+            background: linear-gradient(180deg, #ff9cb7 0%, #ff6f9a 100%);
+            color: #fffbe8;
+            --band: rgba(255, 210, 238, 0.48);
+        }
+
+        .can.assault {
+            background: linear-gradient(180deg, #5a3b2c 0%, #2c1f17 100%);
+            color: #ffbd6f;
+            --band: rgba(255, 188, 98, 0.38);
+        }
+
+        .can.mango {
+            background: linear-gradient(180deg, #ffd36d 0%, #ff9e2f 100%);
+            color: #fff7cc;
+            --band: rgba(255, 241, 173, 0.5);
+        }
+
+        .can.zero {
+            background: linear-gradient(180deg, #111111 0%, #1c1c1c 100%);
+            color: #ff4f4f;
+            --band: rgba(255, 92, 92, 0.4);
+        }
+
+        .name {
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            color: #ffe6f1;
+        }
+
+        .desc {
+            margin-top: 6px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #ffc8dd;
+        }
+
+        @media (max-width: 900px) {
+            .gallery {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 620px) {
+            .gallery {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @keyframes card-ripple {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0.9;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(18);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="pointer-glow" id="pointerGlow"></div>
+    <div class="bg-vines">
+        <div class="vine v1"></div>
+        <div class="vine v2"></div>
+        <div class="vine v3"></div>
+        <div class="vine v4"></div>
+        <div class="vine v5"></div>
+        <div class="vine v6"></div>
+        <div class="vine v7"></div>
+        <div class="vine v8"></div>
+        <div class="vine v9"></div>
+        <div class="vine v10"></div>
+        <span class="leaf lf1"></span>
+        <span class="leaf lf2"></span>
+        <span class="leaf lf3"></span>
+        <span class="leaf lf4"></span>
+        <span class="leaf lf5"></span>
+        <span class="leaf lf6"></span>
+        <span class="leaf lf7"></span>
+        <span class="leaf lf8"></span>
+        <span class="leaf lf9"></span>
+        <span class="leaf lf10"></span>
+        <span class="leaf lf11"></span>
+        <span class="leaf lf12"></span>
+        <span class="halo a1"></span>
+        <span class="halo a2"></span>
+        <span class="halo a3"></span>
+        <span class="halo a4"></span>
+        <span class="spark s1"></span>
+        <span class="spark s2"></span>
+        <span class="spark s3"></span>
+        <span class="spark s4"></span>
+        <span class="heart h1">&#10084;</span>
+        <span class="heart h2">&#10084;</span>
+        <span class="heart h3">&#10084;</span>
+        <span class="heart h4">&#10084;</span>
+        <span class="heart h5">&#10084;</span>
+        <span class="petal p1"></span>
+        <span class="petal p2"></span>
+        <span class="petal p3"></span>
+        <span class="petal p4"></span>
+        <span class="petal p5"></span>
+        <span class="petal p6"></span>
+    </div>
+    <canvas id="blossomCanvas" class="blossom-canvas"></canvas>
+
+    <main class="wrap">
+        <div class="topbar">
+            <a class="back-btn" href="heart-particle.html">Back</a>
+            <h1>Monster Energy Gallery</h1>
+        </div>
+        <p class="subtitle">A full Monster-themed page with can visuals and neon design.</p>
+        <div class="variant-note" id="variantNote">
+            <h3>Note</h3>
+            <p id="variantNoteText">Click a variant to reveal a message.</p>
+        </div>
+
+        <section class="gallery">
+            <article class="card" data-note="I love it when you yap about things you love">
+                <div class="can original">
+                    <img class="logo-img" src="how-to-draw-monster-energy-logo-monster-logo_5e4c957cc94ac6.91425601_43460_3_4.jpg" alt="Monster logo" onerror="this.style.display='none';this.parentElement.classList.add('no-logo');">
+                    <span class="claw"><span></span><span></span><span></span></span>
+                    <span class="tab"></span>
+                    <span class="shine"></span>
+                    <span class="band"></span>
+                    <span class="stamp">16 FL OZ</span>
+                </div>
+                <h2 class="name">Original</h2>
+                <p class="desc">Classic black-and-green style.</p>
+            </article>
+            <article class="card" data-note="I adore how smart you are and how effortless things go when im with you">
+                <div class="can ultra">
+                    <img class="logo-img" src="how-to-draw-monster-energy-logo-monster-logo_5e4c957cc94ac6.91425601_43460_3_4.jpg" alt="Monster logo" onerror="this.style.display='none';this.parentElement.classList.add('no-logo');">
+                    <span class="claw"><span></span><span></span><span></span></span>
+                    <span class="frost"></span>
+                    <span class="ultra-mark">ULTRA</span>
+                    <span class="tab"></span>
+                    <span class="shine"></span>
+                    <span class="band"></span>
+                    <span class="stamp">ULTRA ZERO</span>
+                </div>
+                <h2 class="name">Ultra White</h2>
+                <p class="desc">Clean white edition with green claw glow.</p>
+            </article>
+            <article class="card" data-note="I love for who you are, flaws or not, everything is perfect when I'm with you">
+                <div class="can pipeline">
+                    <img class="logo-img" src="how-to-draw-monster-energy-logo-monster-logo_5e4c957cc94ac6.91425601_43460_3_4.jpg" alt="Monster logo" onerror="this.style.display='none';this.parentElement.classList.add('no-logo');">
+                    <span class="claw"><span></span><span></span><span></span></span>
+                    <span class="tab"></span>
+                    <span class="shine"></span>
+                    <span class="band"></span>
+                    <span class="stamp">PUNCH</span>
+                </div>
+                <h2 class="name">Pipeline Punch</h2>
+                <p class="desc">Pink tropical-inspired energy style.</p>
+            </article>
+            <article class="card" data-note="I like it when you act all in control even tho I'm letting you">
+                <div class="can assault">
+                    <img class="logo-img" src="how-to-draw-monster-energy-logo-monster-logo_5e4c957cc94ac6.91425601_43460_3_4.jpg" alt="Monster logo" onerror="this.style.display='none';this.parentElement.classList.add('no-logo');">
+                    <span class="claw"><span></span><span></span><span></span></span>
+                    <span class="tab"></span>
+                    <span class="shine"></span>
+                    <span class="band"></span>
+                    <span class="stamp">ASSAULT</span>
+                </div>
+                <h2 class="name">Assault</h2>
+                <p class="desc">Dark cola-tone can concept.</p>
+            </article>
+            <article class="card" data-note="I love it when you add effort to things you love">
+                <div class="can mango">
+                    <img class="logo-img" src="how-to-draw-monster-energy-logo-monster-logo_5e4c957cc94ac6.91425601_43460_3_4.jpg" alt="Monster logo" onerror="this.style.display='none';this.parentElement.classList.add('no-logo');">
+                    <span class="claw"><span></span><span></span><span></span></span>
+                    <span class="tab"></span>
+                    <span class="shine"></span>
+                    <span class="band"></span>
+                    <span class="stamp">MANGO</span>
+                </div>
+                <h2 class="name">Mango Loco</h2>
+                <p class="desc">Bright mango-orange themed design.</p>
+            </article>
+            <article class="card" data-note="I love it when I'm with you">
+                <div class="can zero">
+                    <img class="logo-img" src="how-to-draw-monster-energy-logo-monster-logo_5e4c957cc94ac6.91425601_43460_3_4.jpg" alt="Monster logo" onerror="this.style.display='none';this.parentElement.classList.add('no-logo');">
+                    <span class="claw"><span></span><span></span><span></span></span>
+                    <span class="tab"></span>
+                    <span class="shine"></span>
+                    <span class="band"></span>
+                    <span class="stamp">ZERO SUGAR</span>
+                </div>
+                <h2 class="name">Zero Sugar</h2>
+                <p class="desc">Black and red high-contrast style.</p>
+            </article>
+        </section>
+    </main>
+
+    <script>
+        // Convert near-black pixels in the JPG logo to transparent at runtime.
+        (function makeLogoTransparent() {
+            const logoImages = Array.from(document.querySelectorAll(".logo-img"));
+            if (!logoImages.length) return;
+
+            const source = logoImages[0].getAttribute("src");
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement("canvas");
+                canvas.width = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0);
+
+                const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const px = frame.data;
+
+                for (let i = 0; i < px.length; i += 4) {
+                    const r = px[i];
+                    const g = px[i + 1];
+                    const b = px[i + 2];
+
+                    if (r < 38 && g < 38 && b < 38) {
+                        px[i + 3] = 0;
+                    } else if (r < 64 && g < 64 && b < 64) {
+                        px[i + 3] = Math.min(px[i + 3], 90);
+                    }
+                }
+
+                ctx.putImageData(frame, 0, 0);
+                const transparentUrl = canvas.toDataURL("image/png");
+                logoImages.forEach((el) => {
+                    el.src = transparentUrl;
+                });
+            };
+            img.src = source;
+        })();
+
+        (function blossomParticles() {
+            const canvas = document.getElementById("blossomCanvas");
+            if (!canvas) return;
+
+            const ctx = canvas.getContext("2d");
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            let w = 0;
+            let h = 0;
+            let flowers = [];
+            let lastSpawn = 0;
+
+            function resize() {
+                w = window.innerWidth;
+                h = window.innerHeight;
+                canvas.width = Math.floor(w * dpr);
+                canvas.height = Math.floor(h * dpr);
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            }
+
+            function rand(min, max) {
+                return min + Math.random() * (max - min);
+            }
+
+            function makeFlower(x, y, boost = false) {
+                return {
+                    x,
+                    y,
+                    vy: rand(-0.25, -0.06) * (boost ? 1.5 : 1),
+                    size: rand(8, 18) * (boost ? 0.9 : 1),
+                    life: 0,
+                    maxLife: rand(90, 145),
+                    rot: rand(0, Math.PI * 2),
+                    spin: rand(-0.01, 0.01),
+                    petals: 5,
+                    color: Math.random() > 0.5 ? "rgba(255, 158, 200," : "rgba(255, 188, 220,"
+                };
+            }
+
+            function spawnAuto() {
+                flowers.push(makeFlower(rand(0, w), rand(h * 0.08, h * 0.95)));
+                if (flowers.length > 140) flowers = flowers.slice(-140);
+            }
+
+            function spawnBurst(x, y) {
+                for (let i = 0; i < 9; i++) {
+                    flowers.push(makeFlower(x + rand(-24, 24), y + rand(-18, 18), true));
+                }
+            }
+
+            function drawFlower(f) {
+                const t = f.life / f.maxLife;
+                const bloom = t < 0.35 ? t / 0.35 : 1;
+                const alpha = t < 0.7 ? 0.9 : Math.max(0, 1 - (t - 0.7) / 0.3);
+                const r = f.size * bloom;
+                const unfold = Math.min(1, bloom * 1.25);
+                const ccwSweep = (1 - unfold) * 0.95;
+
+                ctx.save();
+                ctx.translate(f.x, f.y);
+                ctx.rotate(f.rot);
+                for (let i = 0; i < f.petals; i++) {
+                    ctx.save();
+                    // Petals unfurl counter-clockwise as bloom grows.
+                    const targetAngle = (Math.PI * 2 * i) / f.petals;
+                    const startAngle = targetAngle + ccwSweep;
+                    const angle = startAngle - ccwSweep * unfold;
+                    ctx.rotate(angle);
+                    ctx.fillStyle = `${f.color}${alpha * 0.9})`;
+                    ctx.beginPath();
+                    ctx.ellipse(0, -r * 0.9, r * 0.48, r * 0.9, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+                ctx.fillStyle = `rgba(255, 240, 180, ${alpha})`;
+                ctx.beginPath();
+                ctx.arc(0, 0, Math.max(1.5, r * 0.28), 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            function tick(ts) {
+                ctx.clearRect(0, 0, w, h);
+
+                if (ts - lastSpawn > 260) {
+                    spawnAuto();
+                    lastSpawn = ts;
+                }
+
+                flowers.forEach((f) => {
+                    f.life += 1;
+                    f.y += f.vy;
+                    f.rot += f.spin;
+                    drawFlower(f);
+                });
+                flowers = flowers.filter((f) => f.life < f.maxLife && f.y > -40);
+
+                requestAnimationFrame(tick);
+            }
+
+            window.addEventListener("resize", resize);
+            window.addEventListener("click", (e) => {
+                spawnBurst(e.clientX, e.clientY);
+            });
+
+            resize();
+            requestAnimationFrame(tick);
+        })();
+
+        (function interactiveDesign() {
+            const glow = document.getElementById("pointerGlow");
+            const cards = Array.from(document.querySelectorAll(".card"));
+            const noteBox = document.getElementById("variantNote");
+            const noteText = document.getElementById("variantNoteText");
+
+            window.addEventListener("pointermove", (e) => {
+                if (!glow) return;
+                glow.style.opacity = "1";
+                glow.style.left = `${e.clientX}px`;
+                glow.style.top = `${e.clientY}px`;
+            });
+
+            window.addEventListener("pointerleave", () => {
+                if (!glow) return;
+                glow.style.opacity = "0";
+            });
+
+            cards.forEach((card) => {
+                card.addEventListener("mousemove", (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const px = (e.clientX - rect.left) / rect.width;
+                    const py = (e.clientY - rect.top) / rect.height;
+                    const rx = (0.5 - py) * 9;
+                    const ry = (px - 0.5) * 11;
+                    card.style.transform = `perspective(860px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+                });
+
+                card.addEventListener("mouseleave", () => {
+                    card.style.transform = "perspective(860px) rotateX(0deg) rotateY(0deg)";
+                });
+
+                card.addEventListener("click", (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const ripple = document.createElement("span");
+                    ripple.className = "ripple";
+                    ripple.style.left = `${e.clientX - rect.left}px`;
+                    ripple.style.top = `${e.clientY - rect.top}px`;
+                    card.appendChild(ripple);
+                    setTimeout(() => ripple.remove(), 650);
+
+                    const note = card.getAttribute("data-note");
+                    if (note && noteBox && noteText) {
+                        noteText.textContent = note;
+                        noteBox.classList.add("show");
+                    }
+                });
+            });
+        })();
+    </script>
+</body>
+
+</html>
